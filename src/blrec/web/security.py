@@ -5,6 +5,8 @@ from typing import Dict, Optional, Set
 from fastapi import Header, Request, status
 from fastapi.exceptions import HTTPException
 
+from .visitor_logger import log_visitor
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,3 +71,6 @@ async def authenticate(
         del attempting_clients[client_ip]
     if client_ip not in whitelist:
         whitelist.add(client_ip)
+
+    # 认证成功的记录访问日志
+    log_visitor(request)
