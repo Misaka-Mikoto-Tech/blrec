@@ -3,12 +3,14 @@ import {
   ChangeDetectorRef,
   Component,
   OnDestroy,
+  OnInit,
 } from '@angular/core';
 import { Router, NavigationEnd, NavigationStart } from '@angular/router';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { AuthService } from './core/services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +18,7 @@ import { takeUntil } from 'rxjs/operators';
   styleUrls: ['./app.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnDestroy {
+export class AppComponent implements OnDestroy, OnInit {
   title = 'B 站直播录制';
   theme: 'light' | 'dark' = 'light';
 
@@ -28,7 +30,8 @@ export class AppComponent implements OnDestroy {
   constructor(
     router: Router,
     changeDetector: ChangeDetectorRef,
-    breakpointObserver: BreakpointObserver
+    breakpointObserver: BreakpointObserver,
+    private auth: AuthService
   ) {
     router.events.subscribe((event) => {
       if (event instanceof NavigationStart) {
@@ -64,6 +67,11 @@ export class AppComponent implements OnDestroy {
         this.collapsed = state.matches;
         changeDetector.markForCheck();
       });
+  }
+  ngOnInit(): void {
+    let url = new URL(location.href);
+    let api_key = url.searchParams.get('api-key');
+    api_key && this.auth.setApiKey(api_key);
   }
 
   ngOnDestroy() {
